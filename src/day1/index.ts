@@ -1,3 +1,5 @@
+//https://adventofcode.com/2025/day/1
+
 import { describe, expect, test } from "bun:test";
 
 class Dial {
