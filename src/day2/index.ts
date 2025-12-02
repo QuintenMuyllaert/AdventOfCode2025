@@ -7,21 +7,15 @@ class IDMachine {
 
 	sumOfInvalids = 0;
 
-	isValidID(val: number) {
-		const str = val.toString();
-		const len = str.length;
-		if (len % 2) return true;
-		const halfLen = len / 2;
-		const p1 = str.substring(0, halfLen);
-		const p2 = str.substring(halfLen);
-		return p1 !== p2;
-	}
-
-	private range2values(range: string) {
+	protected range2values(range: string) {
 		const [start, end] = range.split("-").map(Number);
 		if (start === undefined || end === undefined) throw "Invalid Range";
 		const len = end - start + 1;
 		return new Array(len).fill(0).map((_e, i) => start + i);
+	}
+
+	isValidID(_val: number): boolean {
+		return true;
 	}
 
 	getInvalidIds(range: string) {
@@ -38,9 +32,44 @@ class IDMachine {
 	}
 }
 
+class IDMachineP1 extends IDMachine {
+	override isValidID(val: number) {
+		const str = val.toString();
+		const len = str.length;
+		if (len % 2) return true;
+		const halfLen = len / 2;
+		const p1 = str.substring(0, halfLen);
+		const p2 = str.substring(halfLen);
+		return p1 !== p2;
+	}
+}
+
+class IDMachineP2 extends IDMachine {
+	override isValidID(val: number) {
+		const str = val.toString();
+		const len = str.length;
+		const halfLen = len / 2;
+		for (let i = 1; i <= halfLen; i++) {
+			const matchPart = str.substring(0, i);
+			const regx = new RegExp(matchPart, "g");
+
+			const isInvalid =
+				str
+					.matchAll(regx)
+					.toArray()
+					.map((e) => e[0])
+					.join("") === str;
+
+			if (isInvalid) return false;
+		}
+
+		return true;
+	}
+}
+
 describe("Part 1", () => {
 	test("Example input matches", async () => {
-		const checker = new IDMachine();
+		const checker = new IDMachineP1();
 		const { default: example } = await import("./example.txt");
 		const ranges = example.trim().split(",");
 		for (const range of ranges) {
@@ -51,13 +80,35 @@ describe("Part 1", () => {
 	});
 
 	test("Test on real input", async () => {
-		const checker = new IDMachine();
+		const checker = new IDMachineP1();
 		const { default: example } = await import("./input.txt");
 		const ranges = example.trim().split(",");
 		for (const range of ranges) {
 			console.info(checker.getInvalidIds(range));
 		}
 
+		console.log(`Sum of all invalid id's : ${checker.sumOfInvalids}`);
+	});
+});
+
+describe("Part 2", () => {
+	test("Example input matches", async () => {
+		const checker = new IDMachineP2();
+		const { default: example } = await import("./example.txt");
+		const ranges = example.trim().split(",");
+		for (const range of ranges) {
+			console.info(checker.getInvalidIds(range));
+		}
+		expect(checker.sumOfInvalids).toEqual(4174379265);
+	});
+
+	test("Test on real input", async () => {
+		const checker = new IDMachineP2();
+		const { default: example } = await import("./input.txt");
+		const ranges = example.trim().split(",");
+		for (const range of ranges) {
+			console.info(checker.getInvalidIds(range));
+		}
 		console.log(`Sum of all invalid id's : ${checker.sumOfInvalids}`);
 	});
 });

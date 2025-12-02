@@ -6,7 +6,7 @@ Specifically bun test so I can directly test all of the conditions & edge cases.
 Running where `[X]` is a day number.
 
 ```sh
-bun test ./src/day[X]/index.ts
+bun test ./src/day[X]/index.ts --timeout 60000
 ```
 
 Important note, as per guideline of https://adventofcode.com/2025/about#faq_copying
