@@ -91,8 +91,8 @@ describe("Part 1", () => {
 
 	test("Test on real input", async () => {
 		const checker = new IDMachineP1();
-		const { default: example } = await import("./input.txt");
-		const ranges = example.trim().split(",");
+		const { default: input } = await import("./input.txt");
+		const ranges = input.trim().split(",");
 		for (const range of ranges) {
 			console.info(checker.getInvalidIds(range));
 		}
@@ -114,8 +114,8 @@ describe("Part 2", () => {
 
 	test("Test on real input", async () => {
 		const checker = new IDMachineP2();
-		const { default: example } = await import("./input.txt");
-		const ranges = example.trim().split(",");
+		const { default: input } = await import("./input.txt");
+		const ranges = input.trim().split(",");
 		for (const range of ranges) {
 			console.info(checker.getInvalidIds(range));
 		}
@@ -136,8 +136,8 @@ describe("Part 2 Optimised", () => {
 
 	test("Test on real input", async () => {
 		const checker = new IDMachineP2_Opt();
-		const { default: example } = await import("./input.txt");
-		const ranges = example.trim().split(",");
+		const { default: input } = await import("./input.txt");
+		const ranges = input.trim().split(",");
 		for (const range of ranges) {
 			console.info(checker.getInvalidIds(range));
 		}
