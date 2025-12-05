@@ -1,4 +1,4 @@
-//https://adventofcode.com/2025/day/3
+//https://adventofcode.com/2025/day/4
 
 import { describe, expect, test } from "bun:test";
 
