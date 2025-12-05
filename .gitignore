@@ -34,6 +34,6 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .DS_Store
 
 
-example.txt
-input.txt
+example*.txt
+input*.txt
 readme-*.md
