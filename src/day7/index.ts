@@ -20,7 +20,7 @@ class TachyonManifold {
 			}
 		}
 
-		console.info(this.grid.map((l) => l.join("")).join("\n"));
+		// console.info(this.grid.map((l) => l.join("")).join("\n"));
 	}
 
 	setCharAt(x: number, y: number, char: TChar) {
@@ -72,7 +72,7 @@ class QuantumTachyonManifold {
 			}
 		}
 
-		console.info(this.grid.map((l) => l.join("")).join("\n"));
+		// console.info(this.grid.map((l) => l.join("")).join("\n"));
 
 		this.go();
 	}
@@ -91,7 +91,7 @@ class QuantumTachyonManifold {
 	async down(x: number, y: number, str: number) {
 		if (!str) return;
 
-		const prom = new Promise((res) => {
+		const prom = new Promise<number>((res) => {
 			this.proms.push({
 				fn: res,
 				x,
@@ -100,9 +100,10 @@ class QuantumTachyonManifold {
 			});
 		});
 
-		if (!this.beamz[`${x}-${y}`]) this.beamz[`${x}-${y}`] = str;
+		const key = `${x}-${y}`;
+		if (!this.beamz[key]) this.beamz[key] = str;
 		else {
-			this.beamz[`${x}-${y}`] += str;
+			this.beamz[key] += str;
 			this.splits++;
 		}
 
@@ -125,23 +126,22 @@ class QuantumTachyonManifold {
 	}
 
 	async go() {
-		console.log(this.proms.length);
-
 		const proms = this.proms.filter((p) => p.y === this.depth);
 		this.proms = this.proms.filter((p) => p.y !== this.depth);
 
 		let uniqueXY: Record<string, number> = {};
 		for (const prom of proms) {
-			console.log("str", prom.str);
-			if (uniqueXY[`${prom.x}-${prom.y}`]) uniqueXY[`${prom.x}-${prom.y}`] += prom.str;
-			else uniqueXY[`${prom.x}-${prom.y}`] = prom.str;
+			const key = `${prom.x}-${prom.y}`;
+			if (uniqueXY[key]) uniqueXY[key] += prom.str;
+			else uniqueXY[key] = prom.str;
 		}
 
 		for (const prom of proms) {
 			const keys = Object.keys(uniqueXY);
-			if (keys.includes(`${prom.x}-${prom.y}`)) {
-				prom.fn(uniqueXY[`${prom.x}-${prom.y}`]);
-				delete uniqueXY[`${prom.x}-${prom.y}`];
+			const key = `${prom.x}-${prom.y}`;
+			if (keys.includes(key)) {
+				prom.fn(uniqueXY[key]);
+				delete uniqueXY[key];
 			}
 		}
 
@@ -153,15 +153,18 @@ class QuantumTachyonManifold {
 			} else {
 				let sum = 0;
 				for (const prom of proms) {
-					console.log(prom.str, prom.x);
 					sum += prom.str;
 				}
 
-				//29893386035180
-				console.log({ sum });
+				this.resolveBeams(sum);
 			}
 		});
 	}
+
+	resolveBeams: Function = (a: number) => {};
+	calculateTimelines = new Promise((res) => {
+		this.resolveBeams = res;
+	});
 }
 
 describe("Part 1", () => {
@@ -185,14 +188,13 @@ describe("Part 2", () => {
 		const { default: example } = await import("./example.txt");
 		const manifold = new QuantumTachyonManifold(example);
 
-		expect(manifold.timelines).toEqual(40);
+		expect(await manifold.calculateTimelines).toEqual(40);
 	});
 
 	test("Split the big beamz", async () => {
 		const { default: input } = await import("./input.txt");
 		const manifold = new QuantumTachyonManifold(input);
 
-		console.log(`We made ${manifold.timelines} timelines, good job.`);
-		// expect().toEqual(29893386035180);
+		console.log(`We made ${await manifold.calculateTimelines} timelines, good job.`);
 	});
 });
