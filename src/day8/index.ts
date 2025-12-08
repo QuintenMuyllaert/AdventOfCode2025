@@ -104,7 +104,7 @@ class PlayGround {
 
 	maxMult = 0;
 
-	buildNetworks(connections: number) {
+	getSortedPairs() {
 		const pairs: { a: Box; b: Box; dist: number }[] = [];
 		for (let i = 0; i < this.boxes.length; i++) {
 			for (let j = i + 1; j < this.boxes.length; j++) {
@@ -117,8 +117,12 @@ class PlayGround {
 				});
 			}
 		}
-
 		pairs.sort((a, b) => a.dist - b.dist);
+		return pairs;
+	}
+
+	buildNetworks(connections: number) {
+		const pairs = this.getSortedPairs();
 
 		const limit = Math.min(connections, pairs.length);
 		for (let i = 0; i < limit; i++) {
@@ -128,6 +132,21 @@ class PlayGround {
 				pair.a.add2Network(pair.b);
 			}
 		}
+	}
+
+	connectUntilSingleCircuit() {
+		const pairs = this.getSortedPairs();
+
+		for (const pair of pairs) {
+			if (!pair.a.network.has(pair.b)) {
+				pair.a.add2Network(pair.b);
+
+				if (pair.a.network.size === this.boxes.length) {
+					return pair.a.x * pair.b.x;
+				}
+			}
+		}
+		return 0;
 	}
 
 	getCircuitCount() {
@@ -212,5 +231,19 @@ describe("Part 1", () => {
 		playGround.buildNetworks(1000);
 
 		console.log(playGround.getMult());
+	});
+});
+
+describe("Part 2", () => {
+	test("Example - Single Circuit", async () => {
+		const { default: example } = await import("./example.txt");
+		const playGround = new PlayGround(example);
+		expect(playGround.connectUntilSingleCircuit()).toEqual(25272);
+	});
+
+	test("Real Input - Single Circuit", async () => {
+		const { default: input } = await import("./input.txt");
+		const playGround = new PlayGround(input);
+		console.log(playGround.connectUntilSingleCircuit());
 	});
 });
